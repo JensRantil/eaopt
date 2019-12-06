@@ -26,39 +26,38 @@ func search(v interface{}, s Slice) (int, error) {
 	return 0, errors.New("value not contained in slice")
 }
 
-// Make a lookup table from a slice, mapping values to indexes.
-func newIndexLookup(s Slice) map[interface{}]int {
-	var lookup = make(map[interface{}]int)
-	for i := 0; i < s.Len(); i++ {
-		lookup[s.At(i)] = i
-	}
-	return lookup
-}
-
 // getCycles determines the cycles that exist between two slices. A cycle is a
 // list of indexes indicating mirroring values between each slice.
 func getCycles(s1, s2 Slice) (cycles [][]int) {
 	var (
-		s1Lookup = newIndexLookup(s1) // Matches values to indexes for quick lookup
-		visited  = make(map[int]bool) // Indicates if an index is already in a cycle or not
+		visited = make(map[int]bool) // Indicates if an index is already in a cycle or not
 	)
 	for i := 0; i < s1.Len(); i++ {
 		if !visited[i] {
 			visited[i] = true
 			var (
 				cycle = []int{i}
-				j     = s1Lookup[s2.At(i)]
+				j     = lookup(s2.At(i), s1)
 			)
 			// Continue building the cycle until it closes in on itself
 			for j != cycle[0] {
 				cycle = append(cycle, j)
 				visited[j] = true
-				j = s1Lookup[s2.At(j)]
+				j = lookup(s2.At(j), s1)
 			}
 			cycles = append(cycles, cycle)
 		}
 	}
 	return
+}
+
+func lookup(needle interface{}, haystack Slice) int {
+	for i := 0; i < haystack.Len(); i++ {
+		if haystack.At(i) == needle {
+			return i
+		}
+	}
+	panic("should never happen")
 }
 
 // getNeighbours converts a slice into an adjacency map mapping values to left

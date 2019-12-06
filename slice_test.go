@@ -24,32 +24,6 @@ func TestSearch(t *testing.T) {
 	}
 }
 
-func TestNewIndexLookup(t *testing.T) {
-	var testCases = []struct {
-		slice  Slice
-		lookup map[interface{}]int
-	}{
-		{
-			slice: IntSlice{1, 2, 3},
-			lookup: map[interface{}]int{
-				1: 0,
-				2: 1,
-				3: 2,
-			},
-		},
-	}
-	for i, tc := range testCases {
-		t.Run(fmt.Sprintf("TC %d", i), func(t *testing.T) {
-			var lookup = newIndexLookup(tc.slice)
-			for k, v := range lookup {
-				if v != tc.lookup[k] {
-					t.Error("createLookup didn't work as expected")
-				}
-			}
-		})
-	}
-}
-
 func TestGetCycles(t *testing.T) {
 	var testCases = []struct {
 		x      []int
